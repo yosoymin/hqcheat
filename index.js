@@ -5,6 +5,10 @@ const PNGCrop = require('png-crop');
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 const colors = require('colors');
+var screencapture = require('screencapture')
+var keypress = require('keypress');
+ 
+const screenshot_path = "E:/Benjamín/Downloads/hqcheat-master/"
 
 const occurrences = (string, subString, allowOverlapping) => {
   string += "";
@@ -32,10 +36,10 @@ const processImage = path => {
   var config1 = { width: 1174 - left - left, height: 2278 - top - bottom, top, left };
   console.log('\033c')
   console.log('Processing...');
-  PNGCrop.crop(path, path + '.2', config1, function (err) {
+  PNGCrop.crop(path, path + '.2.png', config1, function (err) {
     if (err) throw err;
-    exec(`tesseract "${path}.2" "${path}.2.log"`, (err, stdout, stderr) => {
-      fs.unlink(`${path}.2`, () => { });
+    exec(`"C:/Program Files (x86)/Tesseract-OCR/tesseract.exe" --tessdata-dir "C:/Program Files (x86)/Tesseract-OCR/tessdata" -l spa "${path}.2.png" "${path}.2.log"`, (err, stdout, stderr) => {
+      //fs.unlink(`${path}.2.png`, () => { });
       if (err) {
         // node couldn't execute the command
         console.log(`err: ${err}`);
@@ -43,7 +47,7 @@ const processImage = path => {
       }
 
       const contents = fs.readFileSync(`${path}.2.log.txt`, 'utf8');
-      fs.unlink(`${path}.2.log.txt`, () => { });
+      //fs.unlink(`${path}.2.log.txt`, () => { });
 
       const lines = contents.split('\n').filter(x => x);
       const title = lines.slice(0, lines.length - 3).join(' ');
@@ -105,11 +109,37 @@ const processImage = path => {
     });
   });
 }
-var watcher = chokidar.watch('/Users/nicholasclark/Desktop', {
+
+/*var watcher = chokidar.watch(screenshot_path, {
   ignored: /(^|[\/\\])\../,
   ignoreInitial: true,
   persistent: true
 });
 
 
-watcher.on('add', path => path.endsWith('.png') && processImage(path))
+watcher.on('add', path => path.endsWith('.png') && processImage(path))*/
+
+// make `process.stdin` begin emitting "keypress" events
+keypress(process.stdin);
+ 
+// listen for the "keypress" event
+process.stdin.on('keypress', function (ch, key) {
+  console.log('got "keypress"', key);
+  if (key && key.ctrl && key.name == 'a') {
+    //process.stdin.pause();
+    fs.unlink(screenshot_path + 'test.png', function(err){
+      if (err)
+        console.log('Error deleting file');
+
+      screencapture(screenshot_path + 'test.png', function (err, imagePath) {
+        // imagePath is '/path/to/output.png' or null
+        processImage(imagePath)
+      });
+    });
+  }
+});
+ 
+process.stdin.setRawMode(true);
+process.stdin.resume();
+
+// INFO: teseando con este video: https://www.youtube.com/watch?v=C9FpV3lLeww
