@@ -6,8 +6,9 @@ const cheerio = require('cheerio');
 const colors = require('colors');
 var screencapture = require('screencapture')
 var keypress = require('keypress');
+const sharp = require('sharp');
 
-const screenshot_path = process.cwd() + "/images/";
+const screenshot_path = process.cwd() + "\\images\\";
 
 const occurrences = (string, subString, allowOverlapping) => {
     string += "";
@@ -85,19 +86,27 @@ const googleSearch = (title, options) => {
     });
 }
 
-const ocrImage = (path, sufix, config, callback) => {
+const ocrImage = (path, sufix, config, ocrOpt, callback, preProcessImage = undefined) => {
     PNGCrop.crop(path, path + sufix + '.png', config, function (err) {
         if (err) throw err;
-        exec(`"C:/Program Files (x86)/Tesseract-OCR/tesseract.exe" --tessdata-dir "C:/Program Files (x86)/Tesseract-OCR/tessdata" -l spa "${path}${sufix}.png" "${path}${sufix}.log"`, (err, stdout, stderr) => {
-            if (err) {
-                // node couldn't execute the command
-                console.log(`err: ${err}`);
-                return;
-            }
 
-            const contents = fs.readFileSync(`${path}${sufix}.log.txt`, 'utf8');
-            callback(contents);
-        });
+        var callOCR = (file) => {
+            exec(`"C:/Program Files (x86)/Tesseract-OCR/tesseract.exe" ${ocrOpt} --tessdata-dir "C:/Program Files (x86)/Tesseract-OCR/tessdata" "${file}" "${path}${sufix}.log"`, (err, stdout, stderr) => {
+                if (err) {
+                    // node couldn't execute the command
+                    console.log(`err: ${err}`);
+                    return;
+                }
+
+                const contents = fs.readFileSync(`${path}${sufix}.log.txt`, 'utf8');
+                callback(contents);
+            });
+        };
+
+        if (preProcessImage)
+            preProcessImage(path + sufix + ".png", callOCR);
+        else
+            callOCR(path + sufix + ".png");
     });
 }
 
@@ -110,26 +119,30 @@ const collectData = (type, data) => {
 }
 
 const processImage = path => {
-    /*ocrImage(path, ".2", { width: 770, height: 1300, top: 100, left: 250 }, function (contents) {
-        const lines = contents.split('\n').filter(x => x);
-        const title = lines.slice(0, lines.length - 3).join(' ');
-        const options = lines.slice(lines.length - 3, lines.length);
-        googleSearch(title, options);
-    });*/
-
     questionData = {};
-    ocrImage(path, ".title", { width: 770, height: 500, top: 570, left: 250 }, function (contents) {
+    ocrImage(path, ".title", { width: 770, height: 500, top: 570, left: 250 }, "", function (contents) {
         const lines = contents.split('\n').filter(x => x);
         const title = lines.slice(0, lines.length).join(' ');
         collectData("title", title);
         //collectData("title", "La Torre inclinada de Pisa está en:");
     });
-    ocrImage(path, ".options", { width: 770, height: 320, top: 1070, left: 250 }, function (contents) {
+    ocrImage(path, ".options", { width: 770, height: 320, top: 1070, left: 250 }, "--psm 11", function (contents) {
         const lines = contents.split('\n').filter(x => x);
         const options = lines.slice(0, lines.length);
         collectData("options", options);
         //collectData("options", [ "Florencia", "Venecia", "Ninguna de las anteriores" ]);
-    });
+    }/*,
+    function (imagePath, callOCR) {
+        sharp(imagePath)
+            //.negate().removeAlpha()
+            .normalize()
+            .sharpen(1)
+            .toFile(imagePath + ".process.png", (err, info) => {
+                if (err)
+                    console.log(err);
+                callOCR(imagePath + ".process.png");
+            });
+    }*/);
 }
 
 // make `process.stdin` begin emitting "keypress" events
