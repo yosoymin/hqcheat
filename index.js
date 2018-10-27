@@ -1,5 +1,4 @@
 const fs = require('fs');
-const chokidar = require('chokidar');
 const { exec } = require('child_process');
 const PNGCrop = require('png-crop');
 const fetch = require('node-fetch');
@@ -8,7 +7,7 @@ const colors = require('colors');
 var screencapture = require('screencapture')
 var keypress = require('keypress');
  
-const screenshot_path = "E:/Benjamín/Downloads/hqcheat-master/"
+const screenshot_path = process.cwd() + "/";
 
 const occurrences = (string, subString, allowOverlapping) => {
   string += "";
@@ -30,10 +29,7 @@ const occurrences = (string, subString, allowOverlapping) => {
 }
 
 const processImage = path => {
-  const top = 400;
-  const bottom = 900;
-  const left = 150;
-  var config1 = { width: 1174 - left - left, height: 2278 - top - bottom, top, left };
+  var config1 = { width: 770, height: 1300, top: 100, left: 250 };
   console.log('\033c')
   console.log('Processing...');
   PNGCrop.crop(path, path + '.2.png', config1, function (err) {
@@ -110,15 +106,6 @@ const processImage = path => {
   });
 }
 
-/*var watcher = chokidar.watch(screenshot_path, {
-  ignored: /(^|[\/\\])\../,
-  ignoreInitial: true,
-  persistent: true
-});
-
-
-watcher.on('add', path => path.endsWith('.png') && processImage(path))*/
-
 // make `process.stdin` begin emitting "keypress" events
 keypress(process.stdin);
  
@@ -132,14 +119,17 @@ process.stdin.on('keypress', function (ch, key) {
         console.log('Error deleting file');
 
       screencapture(screenshot_path + 'test.png', function (err, imagePath) {
-        // imagePath is '/path/to/output.png' or null
-        processImage(imagePath)
+          //processImage(imagePath);
+          processImage(screenshot_path + "q12.png");
       });
     });
+  }
+  else if (key && key.ctrl && key.name == 'c') {
+      process.exit(0);
   }
 });
  
 process.stdin.setRawMode(true);
 process.stdin.resume();
 
-// INFO: teseando con este video: https://www.youtube.com/watch?v=C9FpV3lLeww
+// INFO: teseando con este video: https://youtu.be/C9FpV3lLeww?t=247
