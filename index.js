@@ -7,7 +7,7 @@ const colors = require('colors');
 var screencapture = require('screencapture')
 var keypress = require('keypress');
  
-const screenshot_path = process.cwd() + "/";
+const screenshot_path = process.cwd() + "/images/";
 
 const occurrences = (string, subString, allowOverlapping) => {
   string += "";

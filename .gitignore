@@ -8,3 +8,6 @@
 /test.png
 /q12.png.2.png
 /q12.png.2.log.txt
+/bin
+/obj/Debug
+/Q12/Q12.vcxproj.user
