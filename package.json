@@ -3,7 +3,9 @@
     "cheerio": "^1.0.0-rc.2",
     "chokidar": "^1.7.0",
     "colors": "^1.1.2",
+    "keypress": "^0.2.1",
     "node-fetch": "^1.7.3",
-    "png-crop": "^0.0.1"
+    "png-crop": "^0.0.1",
+    "screencapture": "^0.3.1"
   }
 }
