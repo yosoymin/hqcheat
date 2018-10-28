@@ -8,7 +8,7 @@ var screencapture = require('screencapture')
 var keypress = require('keypress');
 const sharp = require('sharp');
 
-const occurrences = (string, subString, allowOverlapping) => {
+const singleOccurrences = (string, subString, allowOverlapping) => {
     string += "";
     subString += "";
     if (subString.length <= 0)
@@ -25,6 +25,15 @@ const occurrences = (string, subString, allowOverlapping) => {
             pos += step;
         } else break;
     }
+    return n;
+}
+
+const occurrences = (string, subString, allowOverlapping) => {
+    var n = singleOccurrences(string, subString, allowOverlapping) * 1000;
+    subString.split(' ').forEach(y => {
+        if (y.length > 3)
+            n += singleOccurrences(string, y, allowOverlapping);
+    });
     return n;
 }
 
