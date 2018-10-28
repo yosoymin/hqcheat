@@ -9,4 +9,5 @@
 /obj/Debug
 /Q12/Q12.vcxproj.user
 /Q12/.vs
-/images
+/images/*.txt
+/images/*.png

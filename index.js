@@ -129,7 +129,7 @@ const collectData = (type, data) => {
 const processImage = path => {
 
     questionData = {};
-    ocrImage(path, ".title", { width: 770, height: 140, top: 940, left: 250 }, "", function (contents) {
+    ocrImage(path, ".title", { width: 750, height: 270, top: 740, left: 260 }, "", function (contents) {
         const lines = contents.split('\n').filter(x => x);
         const title = lines.slice(0, lines.length-1).join(' ');
         collectData("title", title);
@@ -147,7 +147,7 @@ const processImage = path => {
             });
     };
 
-    ocrImage(path, ".options", { width: 650, height: 320, top: 1070, left: 330 }, "--psm 11", function (contents) {
+    ocrImage(path, ".options", { width: 650, height: 350, top: 1010, left: 340 }, "--psm 11", function (contents) {
         const lines = contents.split('\n').filter(x => x);
         const options = lines.slice(0, 3);
         collectData("options", options);
