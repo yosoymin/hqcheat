@@ -8,12 +8,11 @@ var screencapture = require('screencapture')
 var keypress = require('keypress');
 const sharp = require('sharp');
 
-const screenshot_path = process.cwd() + "\\images\\";
-
 const occurrences = (string, subString, allowOverlapping) => {
     string += "";
     subString += "";
-    if (subString.length <= 0) return (string.length + 1);
+    if (subString.length <= 0)
+        return (string.length + 1);
 
     var n = 0,
         pos = 0,
@@ -30,14 +29,15 @@ const occurrences = (string, subString, allowOverlapping) => {
 }
 
 const googleSearch = (title, options) => {
-    const shouldInvert = title.toLowerCase().indexOf(' no ') >= 0;
+    const shouldInvert = false; //title.toLowerCase().indexOf(' no ') >= 0;
     const searchTitle = shouldInvert ? title.replace(/ no /i, ' ') : title;
 
     console.log(`${colors.gray('Got question:')} ${title}`);
     console.log(`${colors.gray('Got options:')}  ${options.join(', ')}`);
 
     const headers = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36' };
-    const promises = ['', ...options].map(o => fetch(`https://www.google.com/search?q=${encodeURIComponent(searchTitle)}+${encodeURIComponent('"' + o + '"')}`, { headers }));
+    const url = `https://www.google.es/search?q=${encodeURIComponent(searchTitle)}`;
+    const promises = ['', ...options].map(o => fetch(`${url}+${encodeURIComponent('"' + o + '"')}`, { headers }));
     Promise.all(promises.map(p => p.then(res => res.text()))).then((results) => {
         const $ = cheerio.load(results[0]);
         const genericSearch = results[0].toLowerCase();
@@ -58,9 +58,8 @@ const googleSearch = (title, options) => {
                 return o1.count > o2.count ? -1 : 1;
             });
 
-        if (shouldInvert) {
+        if (shouldInvert)
             sortedOptions.reverse();
-        }
 
         console.log(shouldInvert ? colors.bgRed(colors.white('\nQuestion has NOT - reversing results\n')) : '');
         console.log(colors.bgBlack(colors.white(`Top Answer: ${sortedOptions[0].name} (${sortedOptions[0].count} - ${sortedOptions[0].scopedCount})`)));
@@ -119,20 +118,15 @@ const collectData = (type, data) => {
 }
 
 const processImage = path => {
+
     questionData = {};
-    ocrImage(path, ".title", { width: 770, height: 500, top: 570, left: 250 }, "", function (contents) {
+    ocrImage(path, ".title", { width: 770, height: 140, top: 940, left: 250 }, "", function (contents) {
         const lines = contents.split('\n').filter(x => x);
-        const title = lines.slice(0, lines.length).join(' ');
+        const title = lines.slice(0, lines.length-1).join(' ');
         collectData("title", title);
-        //collectData("title", "La Torre inclinada de Pisa está en:");
     });
-    ocrImage(path, ".options", { width: 770, height: 320, top: 1070, left: 250 }, "--psm 11", function (contents) {
-        const lines = contents.split('\n').filter(x => x);
-        const options = lines.slice(0, lines.length);
-        collectData("options", options);
-        //collectData("options", [ "Florencia", "Venecia", "Ninguna de las anteriores" ]);
-    }/*,
-    function (imagePath, callOCR) {
+
+    var processCrop = function (imagePath, callOCR) {
         sharp(imagePath)
             //.negate().removeAlpha()
             .normalize()
@@ -142,7 +136,20 @@ const processImage = path => {
                     console.log(err);
                 callOCR(imagePath + ".process.png");
             });
-    }*/);
+    };
+
+    ocrImage(path, ".options", { width: 650, height: 320, top: 1070, left: 330 }, "--psm 11", function (contents) {
+        const lines = contents.split('\n').filter(x => x);
+        const options = lines.slice(0, 3);
+        collectData("options", options);
+    }
+    //, processCrop
+    );
+
+    /*ocrImage(path, ".2", { width: 770, height: 1300, top: 100, left: 250 }, "", function (contents) {
+        const lines = contents.split('\n').filter(x => x);
+        const title = lines.slice(0, lines.length).join(' ');
+    });*/
 }
 
 // make `process.stdin` begin emitting "keypress" events
@@ -150,15 +157,18 @@ keypress(process.stdin);
 
 // listen for the "keypress" event
 process.stdin.on('keypress', function (ch, key) {
-    //console.log('got "keypress"', key);
     if (key && key.ctrl && key.name === 'a') {
-        fs.unlink(screenshot_path + 'test.png', function (err) {
+        const screenshot_dir = process.cwd() + "\\images\\";
+        const screenshot_filename = "q12.png";
+        const screenshotFile = screenshot_dir + screenshot_filename;
+        const dateStr = new Date().toISOString().replace(/:/, '').replace(/:/, '');
+        fs.rename(screenshotFile, screenshot_dir + "\\history\\" + screenshot_filename + "." + dateStr + ".png", function (err) {
             if (err)
-                console.log('Error deleting file');
+                console.log('Error moving file: ' + err);
 
-            screencapture(screenshot_path + 'test.png', function (err, imagePath) {
+            screencapture(screenshotFile, function (err, imagePath) {
                 //processImage(imagePath);
-                processImage(screenshot_path + "q12.png");
+                processImage(screenshot_dir + "test.png");
             });
         });
     }
