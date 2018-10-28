@@ -176,8 +176,8 @@ process.stdin.on('keypress', function (ch, key) {
                 console.log('Error moving file: ' + err);
 
             screencapture(screenshotFile, function (err, imagePath) {
-                //processImage(imagePath);
-                processImage(screenshot_dir + "test.png");
+                processImage(imagePath);
+                //processImage(screenshot_dir + "test.png");
             });
         });
     }
