@@ -29,21 +29,11 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="index.js" />
-    <Content Include="images\Screen Shot 2017-12-22 at 12.24.37 PM.png" />
-    <Content Include="images\Screen Shot 2017-12-22 at 12.25.02 PM.png" />
-    <Content Include="images\Screen Shot 2017-12-22 at 12.25.22 PM.png" />
-    <Content Include="images\Screen Shot 2017-12-22 at 12.26.36 PM.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="images" />
     <Folder Include="Q12" />
     <Folder Include="Q12\Q12" />
-    <Folder Include="Window-Snapshot-Prompt.app" />
-    <Folder Include="Window-Snapshot-Prompt.app\Contents" />
-    <Folder Include="Window-Snapshot-Prompt.app\Contents\MacOS" />
-    <Folder Include="Window-Snapshot-Prompt.app\Contents\Resources" />
-    <Folder Include="Window-Snapshot-Prompt.app\Contents\Resources\description.rtfd" />
-    <Folder Include="Window-Snapshot-Prompt.app\Contents\Resources\Scripts" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
